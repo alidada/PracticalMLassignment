@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+
+<title>PracticalMLassignment</title>
+
+<script type="text/javascript">
+window.onload = function() {
+  var imgs = document.getElementsByTagName('img'), i, img;
+  for (i = 0; i < imgs.length; i++) {
+    img = imgs[i];
+    // center an image if it is the only element of its parent
+    if (img.parentElement.childElementCount === 1)
+      img.parentElement.style.textAlign = 'center';
+  }
+};
+</script>
+
+
+
+
+
+<style type="text/css">
+body, td {
+   font-family: sans-serif;
+   background-color: white;
+   font-size: 13px;
+}
+
+body {
+  max-width: 800px;
+  margin: auto;
+  padding: 1em;
+  line-height: 20px;
+}
+
+tt, code, pre {
+   font-family: 'DejaVu Sans Mono', 'Droid Sans Mono', 'Lucida Console', Consolas, Monaco, monospace;
+}
+
+h1 {
+   font-size:2.2em;
+}
+
+h2 {
+   font-size:1.8em;
+}
+
+h3 {
+   font-size:1.4em;
+}
+
+h4 {
+   font-size:1.0em;
+}
+
+h5 {
+   font-size:0.9em;
+}
+
+h6 {
+   font-size:0.8em;
+}
+
+a:visited {
+   color: rgb(50%, 0%, 50%);
+}
+
+pre, img {
+  max-width: 100%;
+}
+pre {
+  overflow-x: auto;
+}
+pre code {
+   display: block; padding: 0.5em;
+}
+
+code {
+  font-size: 92%;
+  border: 1px solid #ccc;
+}
+
+code[class] {
+  background-color: #F8F8F8;
+}
+
+table, td, th {
+  border: none;
+}
+
+blockquote {
+   color:#666666;
+   margin:0;
+   padding-left: 1em;
+   border-left: 0.5em #EEE solid;
+}
+
+hr {
+   height: 0px;
+   border-bottom: none;
+   border-top-width: thin;
+   border-top-style: dotted;
+   border-top-color: #999999;
+}
+
+@media print {
+   * {
+      background: transparent !important;
+      color: black !important;
+      filter:none !important;
+      -ms-filter: none !important;
+   }
+
+   body {
+      font-size:12pt;
+      max-width:100%;
+   }
+
+   a, a:visited {
+      text-decoration: underline;
+   }
+
+   hr {
+      visibility: hidden;
+      page-break-before: always;
+   }
+
+   pre, blockquote {
+      padding-right: 1em;
+      page-break-inside: avoid;
+   }
+
+   tr, img {
+      page-break-inside: avoid;
+   }
+
+   img {
+      max-width: 100% !important;
+   }
+
+   @page :left {
+      margin: 15mm 20mm 15mm 10mm;
+   }
+
+   @page :right {
+      margin: 15mm 10mm 15mm 20mm;
+   }
+
+   p, h2, h3 {
+      orphans: 3; widows: 3;
+   }
+
+   h2, h3 {
+      page-break-after: avoid;
+   }
+}
+</style>
+
+
+
+</head>
+
+<body>
+<h3>PracticalMLassignment</h3>
+
+<h3>Programming assignment for &ldquo;Practical Machine Learning&rdquo; course project.</h3>
+
+<p>First what we have to do is import data
+In this case I already downloaded data files from coursera page
+and set up R working directory to folder, which contains these files</p>
+
+<pre><code>training &lt;- read.csv(&quot;pml-training.csv&quot;)
+testing &lt;- read.csv(&quot;pml-testing.csv&quot;)
+</code></pre>
+
+<p>Now I am creating partition for training and validation of models</p>
+
+<pre><code>inTrain &lt;- createDataPartition(y=training$classe, p=0.6, list=FALSE)
+training1 &lt;- training[inTrain, ]
+testing1 &lt;- training[-inTrain, ]
+</code></pre>
+
+<p>While trying to predict testing data we found that NA values in data prevents most models from
+corectly predicting right answers.
+So, taking to a mind that our goal is to find right answers on test data,
+we have to select only columns with complete data in testing sequence.</p>
+
+<pre><code>colselect &lt;- complete.cases(t(testing))
+training2 &lt;- training2[,colselect]
+</code></pre>
+
+<p>Now what we got is only 60 columns, which have complete observations in testing sequence.</p>
+
+<p>Also, we have to clear the first 7 columns from dataset,which doesnt contain motion data
+These are:</p>
+
+<ul>
+<li>X<br/></li>
+<li>user_name</li>
+<li>raw_timestamp_part_1 </li>
+<li>raw_timestamp_part_2</li>
+<li>cvtd_timestamp<br/></li>
+<li>new_window<br/></li>
+<li>num_window</li>
+</ul>
+
+<pre><code>training2 &lt;- training2[,-1]
+training2 &lt;- training2[,-1]
+training2 &lt;- training2[,-1]
+training2 &lt;- training2[,-1]
+training2 &lt;- training2[,-1]
+training2 &lt;- training2[,-1]
+training2 &lt;- training2[,-1]
+</code></pre>
+
+<p>So, now we are ready to train model</p>
+
+<pre><code>model1 &lt;- train(classe ~ ., data=training2, method=&quot;rf&quot;, n.trees=100)
+</code></pre>
+
+<p>Checking model on training-testing dataset</p>
+
+<pre><code>summary(predict(model1,testing1)==testing1$classe)
+</code></pre>
+
+<p>In my case I got 7779 true values against 67 false values. Accuracy = 99%.</p>
+
+<p>Now we are ready to predict course quiz test cases</p>
+
+<pre><code>predict(model1,testing)
+</code></pre>
+
+<p>Got a result :<br/>
+[1] B A B A A E D B A A B C B A E E A B B B
+Levels: A B C D E</p>
+
+<p>Finally, data are ready to submit this result to final quiz.</p>
+
+</body>
+
+</html>
