@@ -6,12 +6,15 @@ In this case I already downloaded data files from coursera page
 and set up R working directory to folder, which contains these files
 
 `training <- read.csv("pml-training.csv")`
+
 `testing <- read.csv("pml-testing.csv")`
 
 Now I am creating partition for training and validation of models
 
 `inTrain <- createDataPartition(y=training$classe, p=0.6, list=FALSE)`
+
 `training1 <- training[inTrain, ]`
+
 `testing1 <- training[-inTrain, ]`
 
 While trying to predict testing data we found that NA values in data prevents most models from
@@ -20,6 +23,7 @@ So, taking to a mind that our goal is to find right answers on test data,
 we have to select only columns with complete data in testing sequence.
 
 `colselect <- complete.cases(t(testing))`
+
 `training2 <- training2[,colselect]`
 
 Now what we got is only 60 columns, which have complete observations in testing sequence.
@@ -35,11 +39,17 @@ These are:
 * num_window
 
 `training2 <- training2[,-1]`
+
 `training2 <- training2[,-1]`
+
 `training2 <- training2[,-1]`
+
 `training2 <- training2[,-1]`
+
 `training2 <- training2[,-1]`
+
 `training2 <- training2[,-1]`
+
 `training2 <- training2[,-1]`
 
 So, now we are ready to train model
